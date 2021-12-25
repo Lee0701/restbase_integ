@@ -21,6 +21,8 @@ services:
       # - ./mobileapps:/srv/service
       # - /srv/service/node_modules
       - ./mobileapps.config.yaml:/srv/service/config.yaml
+    ports:
+      - 8888:8888
     restart: always
   pagelib:
     build:
@@ -35,4 +37,6 @@ services:
     environment:
       - PARSOID_DOMAIN_gukhan_wiki=https://wiki.xn--9cs231j0ji.xn--p8s937b.net/w/api.php
       - PARSOID_DOMAIN_localhost=http://localhost/w/api.php
+    # ports:
+    #   - 8000:8000
     restart: always
