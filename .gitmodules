@@ -4,3 +4,6 @@
 [submodule "restbase"]
 	path = restbase
 	url = https://github.com/Lee0701/restbase.git
+[submodule "docker-parsoid"]
+	path = docker-parsoid
+	url = https://github.com/Lee0701/docker-parsoid.git
