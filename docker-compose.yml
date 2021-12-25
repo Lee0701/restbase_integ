@@ -8,27 +8,27 @@ services:
     volumes:
     #  - ./restbase:/srv/service
     #  - /srv/service/node_modules
-     - ./restbase.config.yaml:/srv/service/config.yaml
-     - ./gukhan-wiki.yaml:/srv/service/projects/v1/gukhan-wiki.yaml
+      - ./restbase.config.yaml:/srv/service/config.yaml
+      - ./gukhan-wiki.yaml:/srv/service/projects/v1/gukhan-wiki.yaml
     ports:
-     - 7231:7231
-     - 7233:7233
+      - 7231:7231
+      - 7233:7233
     restart: always
   mobileapps:
     build:
       context: ./mobileapps
     volumes:
-    # - ./mobileapps:/srv/service
-    # - /srv/service/node_modules
-    - ./mobileapps.config.yaml:/srv/service/config.yaml
+      # - ./mobileapps:/srv/service
+      # - /srv/service/node_modules
+      - ./mobileapps.config.yaml:/srv/service/config.yaml
     restart: always
   pagelib:
     build:
       context: ./mobileapps/pagelib
       dockerfile: Dockerfile.dev
     volumes:
-    - ./mobileapps/pagelib:/srv/app
-    - /srv/app/node_modules
+      - ./mobileapps/pagelib:/srv/app
+      - /srv/app/node_modules
   parsoid:
     image: parsoid
     build:
