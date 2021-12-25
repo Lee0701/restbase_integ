@@ -1,0 +1,136 @@
+default_project: &default_project
+  x-modules:
+    - spec:
+        paths:
+          /{api:v1}:
+            x-modules:
+              - path: projects/v1/default.wmf.yaml
+                options: &default_options
+                  parsoid:
+                    host: http://parsoid:8000
+                    grace_ttl: 1000000
+                  action:
+                    apiUriTemplate: "{{'https://{domain}/w/api.php'}}"
+                    baseUriTemplate: "{{'https://{domain}/api/rest_v1'}}"
+                  mobileapps:
+                    host: http://mobileapps:8888
+                  summary:
+                    protocol: https
+                    implementation: mcs
+                    host: http://mobileapps:8888
+                  purged_cache_control: test_purged_cache_control
+                  # Cache control for purged endpoints allowing short-term client caching
+                  purged_cache_control_client_cache: test_purged_cache_control_with_client_caching
+                  transform:
+                    cx_host: http://mobileapps:8888
+                  skip_updates: false
+              - path: projects/proxy.yaml
+                options: &proxy_options
+                  backend_host_template: '{{"/{domain}/sys/legacy"}}'
+                  block_external_reqs: true
+          /{api:sys}: &default_sys
+            x-modules:
+              - path: projects/sys/default.wmf.yaml
+                options: *default_options
+              - path: projects/proxy.yaml
+                options:
+                  <<: *proxy_options
+                  block_external_reqs: false
+              - spec:
+                  paths:
+                    /legacy/key_value:
+                      x-modules:
+                        - path: sys/key_value.js
+                    /legacy/page_revisions:
+                      x-modules:
+                        - path: sys/page_revisions.js
+                    /table: &table_spec
+                      x-modules:
+                        - path: sys/table.js
+                          options:
+                            conf:
+                              backend: '{env(RB_TEST_BACKEND, sqlite)}'
+                              hosts: [localhost]
+                              keyspace: system
+                              username: cassandra
+                              password: cassandra
+                              defaultConsistency: one # or 'localQuorum' for production
+                              storage_groups:
+                                - name: test.group.local
+                                  domains: /./
+                              # ignored in cassandra, but useful in SQLite testing
+                              dbname: '{env(RB_SQLITE_FILE, test.db.sqlite3)}'
+
+wikipedia_project: &wikipedia_project
+  x-modules:
+    - spec:
+        paths:
+          /{api:v1}:
+            x-modules:
+              - path: projects/v1/gukhan-wiki.yaml
+                options: *default_options
+              - path: projects/proxy.yaml
+                options: *proxy_options
+          /{api:sys}: *default_sys
+
+# Hacky way to parametrize RESTBase tests. TODO: Move to config?
+test:
+  content_types:
+    html: '/^text\/html; charset=utf-8; profile="https:\/\/www\.mediawiki\.org\/wiki\/Specs\/HTML\/[\d.]+"$/'
+    data-parsoid: '/^application\/json; charset=utf-8; profile="https:\/\/www\.mediawiki\.org\/wiki\/Specs\/data-parsoid/[\d.]+"$/'
+    wikitext: '/^text\/plain; charset=utf-8; profile="https:\/\/www.mediawiki.org\/wiki\/Specs\/wikitext\/[\d.]+"$/'
+
+
+# The root of the spec tree. Domains tend to share specs by referencing them
+# using YAML references.
+spec_root: &spec_root
+  title: "The RESTBase root"
+  # Some more general RESTBase info
+  x-request-filters:
+    - path: lib/security_response_header_filter.js
+
+  x-sub-request-filters:
+    - type: default
+      name: http
+      options:
+        allow:
+          - pattern: /^https?:\/\/[a-zA-Z0-9.-]+\/w\/api\.php/
+            forward_headers: true
+          - pattern: /^https?:\/\/[a-zA-Z0-9.-]+\/w\/rest\.php.+/
+            forward_headers: true
+          - pattern: /^https?:\/\//
+  paths:
+    /{domain:wiki.xn--9cs231j0ji.xn--p8s937b.net}: *wikipedia_project
+
+# Finally, a standard service-runner config.
+info:
+  name: restbase
+
+services:
+  - name: restbase
+    module: hyperswitch
+    conf: &rb_conf
+      # In production we expose both 7231 and 7233 ports from fullstack RB.
+      port: 7233
+      spec: *spec_root
+      salt: secret
+      default_page_size: 1
+      user_agent: RESTBase-testsuite
+      ui_name: RESTBase
+      ui_url: https://www.mediawiki.org/wiki/RESTBase
+      ui_title: RESTBase docs
+
+logging:
+  name: restbase-test
+  level: warn
+  streams:
+    - type: stdout
+
+metrics:
+  - type: prometheus
+    port: 9000
+  - type: statsd
+    host: localhost
+    port: 8125
+
+num_workers: 0

@@ -1,0 +1,6 @@
+[submodule "mobileapps"]
+	path = mobileapps
+	url = https://github.com/Lee0701/mobileapps.git
+[submodule "restbase"]
+	path = restbase
+	url = https://github.com/Lee0701/restbase.git

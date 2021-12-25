@@ -1,0 +1,37 @@
+version: '3'
+services:
+  restbase:
+    build: .
+    image: restbase
+    build:
+      context: ./restbase
+    volumes:
+    #  - ./restbase:/srv/service
+    #  - /srv/service/node_modules
+     - ./restbase.config.yaml:/srv/service/config.yaml
+     - ./gukhan-wiki.yaml:/srv/service/projects/v1/gukhan-wiki.yaml
+    ports:
+     - 7231:7231
+     - 7233:7233
+    restart: always
+  mobileapps:
+    build:
+      context: ./mobileapps
+    volumes:
+    # - ./mobileapps:/srv/service
+    # - /srv/service/node_modules
+    - ./mobileapps.config.yaml:/srv/service/config.yaml
+    restart: always
+  pagelib:
+    build:
+      context: ./mobileapps/pagelib
+      dockerfile: Dockerfile.dev
+    volumes:
+    - ./mobileapps/pagelib:/srv/app
+    - /srv/app/node_modules
+  parsoid:
+    image: thenets/parsoid:0.11
+    environment:
+      - PARSOID_DOMAIN_gukhan_wiki=https://wiki.xn--9cs231j0ji.xn--p8s937b.net/w/api.php
+      - PARSOID_DOMAIN_localhost=http://localhost/w/api.php
+    restart: always
