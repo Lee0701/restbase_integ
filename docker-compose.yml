@@ -25,7 +25,6 @@ services:
   pagelib:
     build:
       context: ./mobileapps/pagelib
-      dockerfile: Dockerfile.dev
     volumes:
       - ./mobileapps/pagelib:/srv/app
       - /srv/app/node_modules
