@@ -47,12 +47,12 @@ services:
       # csp: false  # uncomment this line to disable sending them
       # CSP for mobile-html
       mobile_html_csp: "default-src 'none';
-        connect-src https://wiki.xn--9cs231j0ji.xn--p8s937b.net 'self';
-        media-src wiki.xn--9cs231j0ji.xn--p8s937b.net 'self';
-        img-src wiki.xn--9cs231j0ji.xn--p8s937b.net wiki.xn--9cs231j0ji.xn--p8s937b.net wiki.xn--9cs231j0ji.xn--p8s937b.net wiki.xn--9cs231j0ji.xn--p8s937b.net 'self' data:;
+        connect-src app://wiki.xn--9cs231j0ji.xn--p8s937b.net https://wiki.xn--9cs231j0ji.xn--p8s937b.net;
+        media-src app://wiki.xn--9cs231j0ji.xn--p8s937b.net https://wiki.xn--9cs231j0ji.xn--p8s937b.net 'self';
+        img-src app://wiki.xn--9cs231j0ji.xn--p8s937b.net https://wiki.xn--9cs231j0ji.xn--p8s937b.net app://wiki.xn--9cs231j0ji.xn--p8s937b.net https://wiki.xn--9cs231j0ji.xn--p8s937b.net 'self' data:;
         object-src 'none';
-        script-src 'self' 'unsafe-inline';
-        style-src wiki.xn--9cs231j0ji.xn--p8s937b.net 'self' 'unsafe-inline';
+        script-src app://wiki.xn--9cs231j0ji.xn--p8s937b.net https://wiki.xn--9cs231j0ji.xn--p8s937b.net 'unsafe-inline';
+        style-src app://wiki.xn--9cs231j0ji.xn--p8s937b.net https://wiki.xn--9cs231j0ji.xn--p8s937b.net app://wiki.xn--9cs231j0ji.xn--p8s937b.net https://wiki.xn--9cs231j0ji.xn--p8s937b.net 'self' 'unsafe-inline';
         frame-ancestors 'self'
         "
       # URL of the outbound proxy to use (complete with protocol)
